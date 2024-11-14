@@ -146,7 +146,7 @@ function listFolderFiles($dir) {
 //	        case "jpeg":                                               //jf: w/o "jpeg" it works sometimes, but not everytimes. I don't know why!
 //	        case "jpg":
 //
-function local_genStdThumb_jf($path,$name){
+function local_genStdThumb($path,$name){
 
 	echo '<li style="list-style-type:square;">6: inside local_genStdThumb()" <br>';                //jf:
 	echo '<li style="list-style-type:square;">7: path: >'.$path."<  name: >".$name.'< "<br>';      //jf:
