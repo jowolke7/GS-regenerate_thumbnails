@@ -18,7 +18,7 @@ $thisfile=basename(__FILE__, ".php");
 register_plugin(
 	$thisfile,       # Plugin id
 	'Regenerate Thumbnails', # Plugin name
-	'1.2',      # Plugin version
+	'1.1',      # Plugin version
 	'jjancel',  # Plugin author
 	'http://jjancel.free.fr/', # author website
 	'Regenerate Thumbnails', # Plugin description
@@ -53,8 +53,52 @@ function frmtFile($dEntry, $fEntry) {
 		$subFolder = substr($dEntry, 16).'/';
 		echo '<li style="list-style-type:square;" > <a href="'.$dEntry.'/'.$fEntry.'" rel="facybox_i" style="text-decoration:none;"> <img src="'.$dEntry.'/'.$fEntry.'" width="20px" style="vertical-align:middle;"> '.$fEntry.' </a><br>';
 
+
+
+        //jf: beg
+        //
+        //
+  		echo '<li style="list-style-type:square;">1: dEntry: >'.$dEntry."<  fEntry: >".$fEntry.'< "<br>';
+        //
+        //
+        // 'data/uploads/' and 'data/thumbs/' seems to be fixed, so ...  
+        //
+        $thumbsPath = str_replace('data/uploads', 'data/thumbs', $dEntry);
+  		echo '<li style="list-style-type:square;">2: thumbsPath: >'.$thumbsPath."<  fEntry: >".$fEntry.'< "<br>';
+        //
+        //
+        // 'data/thumbs/somefolder' does NOT exist ... create it and change mode
+        // Here is the point to 'mkdir' empty folders too. (If an usable file/image is inside the structure!)
+        //        
+		if (!(file_exists($thumbsPath))) {
+			if (defined('GSCHMOD')) { 
+				$chmod_value = GSCHMOD; 
+			} else {
+				$chmod_value = 0755;
+			}
+    		echo '<li style="list-style-type:square;">3. mkdir('.$thumbsPath.',...,true)<br>';
+			// HERE: mkdir() w/ $recursive = true. (https://www.php.net/manual/en/function.mkdir.php)
+			mkdir($thumbsPath, $chmod_value, true); 
+        }
+        //
+        //
+        // folder(s) created
+        //
+        if ($subFolder == '/' ) {$subFolder='';}    //jf: no "//": no "data/thumbs//", but "data/thumbs/" 
+  		echo '<li style="list-style-type:square;">4: $subFolder: >'.$subFolder."<  fEntry: >".$fEntry.'< "<br>';
+  		echo '<li style="list-style-type:square;">5: absolute: >'.GSTHUMBNAILPATH.$subFolder."-".$fEntry.'< "<br>';
+
 		// generate thumbnail
 		local_genStdThumb($subFolder,$fEntry);
+        //
+        //
+        //jf: end
+
+  		
+//jf:		// generate thumbnail
+//jf:		require_once('inc/imagemanipulation.php');	
+//jf:		genStdThumb($subFolder,$fEntry);
+    
 		
 	}
 }
@@ -83,7 +127,7 @@ function listFolderFiles($dir) {
 
 
 
-// beg Replacement of core function genStdThumb (inc/imagemanipulation.php)
+//jf: beg Replacement of core function genStdThumb (inc/imagemanipulation.php)
 //
 // Because of two points:
 //
@@ -99,10 +143,13 @@ function listFolderFiles($dir) {
 //      Not never and not ever. I dont know. Maybe it is due to an entangled quantum in Alpha Centauri ;-)
 //
 //	75  switch(lowercase(pathinfo($targetFile)['extension'])) {
-//	        case "jpeg":                                               // w/o "jpeg" it works sometimes, but not everytimes. I don't know why!
+//	        case "jpeg":                                               //jf: w/o "jpeg" it works sometimes, but not everytimes. I don't know why!
 //	        case "jpg":
 //
 function local_genStdThumb($path,$name){
+
+	echo '<li style="list-style-type:square;">6: inside local_genStdThumb()" <br>';                //jf:
+	echo '<li style="list-style-type:square;">7: path: >'.$path."<  name: >".$name.'< "<br>';      //jf:
 
 	//gd check
 	$php_modules = get_loaded_extensions();
@@ -131,6 +178,7 @@ function local_genStdThumb($path,$name){
 	}
 
 	$targetFile = GSDATAUPLOADPATH.$path.$name;
+	echo '<li style="list-style-type:square;">8: targetFile: >'.$targetFile."<  name: >".$name.'< "<br>';  //jf:
 	
 	//thumbnail for post
 	$imgsize = getimagesize($targetFile);
@@ -166,9 +214,10 @@ function local_genStdThumb($path,$name){
 	
 	if($bool)	{	
 		$thumbnailFile = $thumbsPath . "thumbnail." . $name;
+    	echo '<li style="list-style-type:square;">9: $thumbnailFile >'.$thumbnailFile.'< "<br>';    //jf:
 		
 	    switch(lowercase(pathinfo($targetFile)['extension'])) {
-	        case "jpeg":                                               // w/o "jpeg" it works sometimes, but not everytimes. I don't know why!
+	        case "jpeg":                                               //jf: w/o "jpeg" it works sometimes, but not everytimes. I don't know why!
 	        case "jpg":
 	            $bool2 = imagejpeg($picture,$thumbnailFile,85);
 	        break;
@@ -189,7 +238,7 @@ function local_genStdThumb($path,$name){
 
 	return true;
 }
-// end Replacement of core function genStdThumb (inc/imagemanipulation.php)
+//jf: end Replacement of core function genStdThumb (inc/imagemanipulation.php)
 
 
 ?>
